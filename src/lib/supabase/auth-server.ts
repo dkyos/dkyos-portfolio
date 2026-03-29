@@ -30,6 +30,12 @@ export async function createAuthClient() {
 
 // 현재 로그인 사용자 조회
 export async function getUser() {
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return null;
+  }
   const supabase = await createAuthClient();
   const {
     data: { user },

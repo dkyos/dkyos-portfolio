@@ -5,19 +5,15 @@ import { createAuthClient } from "@/lib/supabase/auth-server";
 export default async function AdminDashboardPage() {
   const supabase = await createAuthClient();
 
-  const { count: totalPosts } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true });
-
-  const { count: publishedPosts } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true })
-    .eq("published", true);
-
-  const { count: draftPosts } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true })
-    .eq("published", false);
+  const [
+    { count: totalPosts },
+    { count: publishedPosts },
+    { count: draftPosts },
+  ] = await Promise.all([
+    supabase.from("posts").select("*", { count: "exact", head: true }),
+    supabase.from("posts").select("*", { count: "exact", head: true }).eq("published", true),
+    supabase.from("posts").select("*", { count: "exact", head: true }).eq("published", false),
+  ]);
 
   return (
     <div>

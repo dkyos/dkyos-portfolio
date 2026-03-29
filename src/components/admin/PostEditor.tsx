@@ -39,7 +39,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
   // 제목으로 슬러그 자동 생성 (새 글일 때만)
   useEffect(() => {
-    if (!isEditing && title && !initialData) {
+    if (!isEditing && title) {
       const generated = title
         .toLowerCase()
         .replace(/[^a-z0-9가-힣\s-]/g, "")
@@ -48,7 +48,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
         .replace(/^-|-$/g, "");
       setSlug(generated);
     }
-  }, [title, isEditing, initialData]);
+  }, [title, isEditing]);
 
   const savePost = useCallback(
     async (published: boolean) => {
@@ -67,16 +67,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
       setMessage("");
 
       const supabase = createAuthBrowserClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setMessage("로그인이 필요합니다.");
-        setSaving(false);
-        setPublishing(false);
-        return;
-      }
 
       const postData = {
         slug: slug.trim(),
@@ -90,41 +80,40 @@ export function PostEditor({ initialData }: PostEditorProps) {
         category: category.trim(),
         published,
         published_at: published ? new Date().toISOString() : null,
-        author_id: user.id,
       };
 
-      let error;
-
       if (isEditing && initialData) {
-        // 기존 글 수정 시 published_at 보존
         const updateData = { ...postData };
         if (published && initialData.published) {
           delete (updateData as Record<string, unknown>).published_at;
         }
-        ({ error } = await supabase
+        const { error } = await supabase
           .from("posts")
           .update(updateData)
-          .eq("id", initialData.id));
-      } else {
-        ({ error } = await supabase.from("posts").insert(postData));
-      }
+          .eq("id", initialData.id);
 
-      if (error) {
-        setMessage(`저장 실패: ${error.message}`);
+        if (error) {
+          setMessage(`저장 실패: ${error.message}`);
+        } else {
+          setMessage(published ? "글이 공개되었습니다." : "임시저장되었습니다.");
+          router.refresh();
+        }
       } else {
-        setMessage(published ? "글이 공개되었습니다." : "임시저장되었습니다.");
-        if (!isEditing) {
-          // 새 글 저장 후 수정 페이지로 이동
-          const { data: newPost } = await supabase
-            .from("posts")
-            .select("id")
-            .eq("slug", slug.trim())
-            .single();
+        const { data: newPost, error } = await supabase
+          .from("posts")
+          .insert(postData)
+          .select("id")
+          .single();
+
+        if (error) {
+          setMessage(`저장 실패: ${error.message}`);
+        } else {
+          setMessage(published ? "글이 공개되었습니다." : "임시저장되었습니다.");
           if (newPost) {
             router.push(`/admin/posts/${newPost.id}/edit`);
           }
+          router.refresh();
         }
-        router.refresh();
       }
 
       setSaving(false);

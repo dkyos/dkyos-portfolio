@@ -7,7 +7,16 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  // Supabase 미설정 시 로그인 페이지는 통과, 나머지 admin은 차단
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (request.nextUrl.pathname.startsWith("/admin/login")) {
+      return supabaseResponse;
+    }
+    if (request.nextUrl.pathname.startsWith("/admin")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      return NextResponse.redirect(url);
+    }
     return supabaseResponse;
   }
 
@@ -28,26 +37,32 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 로그인 페이지는 인증 체크 없이 통과 (무한 루프 방지)
+  if (request.nextUrl.pathname.startsWith("/admin/login")) {
+    // 이미 로그인한 사용자만 대시보드로 리다이렉트
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // /admin 경로 보호 (로그인 페이지 제외)
-  if (
-    request.nextUrl.pathname.startsWith("/admin") &&
-    !request.nextUrl.pathname.startsWith("/admin/login") &&
-    !user
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    return NextResponse.redirect(url);
+    if (user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin";
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
   }
 
-  // 이미 로그인한 사용자가 로그인 페이지 접근 시 대시보드로 이동
-  if (request.nextUrl.pathname === "/admin/login" && user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin";
-    return NextResponse.redirect(url);
+  // /admin 경로 보호
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

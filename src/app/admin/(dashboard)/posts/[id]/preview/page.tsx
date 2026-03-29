@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
 import Link from "next/link";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { createAuthClient } from "@/lib/supabase/auth-server";
 import { PostContent } from "@/components/blog/PostContent";
 import { calculateReadingTime } from "@/lib/posts";
+import { formatDate } from "@/lib/format";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -58,9 +57,7 @@ export default async function PreviewPostPage({ params }: PageProps) {
             {post.published_at && (
               <>
                 <time dateTime={post.published_at}>
-                  {format(new Date(post.published_at), "yyyy년 M월 d일", {
-                    locale: ko,
-                  })}
+                  {formatDate(post.published_at)}
                 </time>
                 <span>&middot;</span>
               </>
