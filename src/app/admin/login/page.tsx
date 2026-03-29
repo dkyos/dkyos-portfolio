@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-client";
 
@@ -11,25 +11,40 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // 이미 로그인된 사용자는 대시보드로 이동
+  useEffect(() => {
+    const supabase = createAuthBrowserClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) router.replace("/admin");
+    });
+  }, [router]);
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const supabase = createAuthBrowserClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const supabase = createAuthBrowserClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      if (authError) {
+        setError(authError.message);
+        setLoading(false);
+        return;
+      }
+
+      router.push("/admin");
+      router.refresh();
+    } catch (err) {
+      setError(
+        `연결 실패: ${err instanceof Error ? err.message : "Supabase에 연결할 수 없습니다."}`
+      );
       setLoading(false);
-      return;
     }
-
-    router.push("/admin");
-    router.refresh();
   }
 
   return (
