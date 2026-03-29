@@ -47,7 +47,6 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-// ISR: 60초마다 재검증
 export const revalidate = 60;
 
 export default async function BlogPostPage({ params }: PageProps) {
@@ -76,21 +75,21 @@ export default async function BlogPostPage({ params }: PageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-6 py-16">
       <Link
         href="/blog"
-        className="mb-8 inline-flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className="-ml-2 mb-8 inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
       >
         <ArrowLeft size={14} />
         블로그로 돌아가기
       </Link>
 
       <article>
-        <header className="mb-8">
-          <h1 className="mb-3 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <header className="mb-10 border-b border-border pb-8">
+          <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground">
             {post.title}
           </h1>
-          <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {post.published_at && (
               <>
                 <time dateTime={post.published_at}>
@@ -102,11 +101,11 @@ export default async function BlogPostPage({ params }: PageProps) {
             <span>{calculateReadingTime(post.content)}</span>
           </div>
           {post.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                  className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground"
                 >
                   {tag}
                 </span>
@@ -118,9 +117,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         <PostContent content={post.content} />
       </article>
 
-      {/* 소셜 공유 버튼 */}
-      <div className="mt-12 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-        <p className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+      {/* 소셜 공유 */}
+      <div className="mt-16 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <p className="mb-3 text-sm font-medium text-card-foreground">
           공유하기
         </p>
         <div className="flex gap-3">
@@ -146,7 +145,7 @@ function ShareButton({ platform, url }: { platform: string; url: string }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+      className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
     >
       {platform}
     </a>

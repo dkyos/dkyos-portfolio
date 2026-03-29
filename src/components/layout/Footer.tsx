@@ -17,9 +17,9 @@ function GitHubIcon({ size = 18 }: { size?: number }) {
 
 export function Footer() {
   return (
-    <footer className="border-t border-zinc-200 dark:border-zinc-800">
+    <footer className="border-t border-border">
       <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
           reserved.
         </p>
@@ -29,7 +29,7 @@ export function Footer() {
               href={siteConfig.links.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
               aria-label="GitHub"
             >
               <GitHubIcon />

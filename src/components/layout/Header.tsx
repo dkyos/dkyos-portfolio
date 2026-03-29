@@ -14,11 +14,11 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-6">
         <Link
           href="/"
-          className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+          className="text-lg font-bold tracking-tight text-foreground"
         >
           DKyos
         </Link>
@@ -32,13 +32,16 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+                className={`relative rounded-md px-3 py-1.5 text-sm transition-colors ${
                   isActive
-                    ? "font-medium text-zinc-900 dark:text-zinc-100"
-                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
                 {item.label}
+                {isActive && (
+                  <span className="absolute bottom-0 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-foreground" />
+                )}
               </Link>
             );
           })}

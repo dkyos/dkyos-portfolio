@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-client";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface TogglePublishButtonProps {
   postId: string;
@@ -14,11 +16,10 @@ export function TogglePublishButton({
   published,
 }: TogglePublishButtonProps) {
   const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
 
   async function handleToggle() {
-    const action = published ? "비공개" : "공개";
-    if (!confirm(`이 글을 ${action}로 전환하시겠습니까?`)) return;
-
+    setShowModal(false);
     const supabase = createAuthBrowserClient();
     const updateData: Record<string, unknown> = { published: !published };
 
@@ -40,24 +41,39 @@ export function TogglePublishButton({
   }
 
   return (
-    <button
-      onClick={handleToggle}
-      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-        published
-          ? "text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
-          : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-      }`}
-      title={published ? "비공개로 전환" : "공개로 전환"}
-    >
-      {published ? (
-        <>
-          <Eye size={14} /> 공개
-        </>
-      ) : (
-        <>
-          <EyeOff size={14} /> 비공개
-        </>
-      )}
-    </button>
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+          published
+            ? "text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
+            : "text-muted-foreground hover:bg-accent"
+        }`}
+        title={published ? "비공개로 전환" : "공개로 전환"}
+      >
+        {published ? (
+          <>
+            <Eye size={14} /> 공개
+          </>
+        ) : (
+          <>
+            <EyeOff size={14} /> 비공개
+          </>
+        )}
+      </button>
+
+      <ConfirmModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleToggle}
+        title={published ? "비공개로 전환" : "공개로 전환"}
+        description={
+          published
+            ? "이 글을 비공개로 전환하면 블로그에서 더 이상 보이지 않습니다."
+            : "이 글을 공개하면 블로그에서 모든 방문자가 볼 수 있습니다."
+        }
+        confirmText={published ? "비공개 전환" : "공개 전환"}
+      />
+    </>
   );
 }

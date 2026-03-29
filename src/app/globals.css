@@ -3,30 +3,80 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── 시맨틱 컬러 토큰 ── */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --border: #e4e4e7;
+  --ring: #18181b;
+  --destructive: #ef4444;
+  --radius: 0.625rem;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --border: #27272a;
+  --ring: #d4d4d8;
+  --destructive: #dc2626;
 }
 
+/* ── Tailwind 테마 연결 ── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* ── 전역 기본 스타일 ── */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.7;
 }
 
-/* 마크다운 코드 블록 스타일 */
+*,
+*::before,
+*::after {
+  border-color: var(--border);
+}
+
+/* ── 마크다운 코드 블록 ── */
 pre > code {
   display: grid;
 }
@@ -41,7 +91,7 @@ code {
   font-family: var(--font-mono), monospace;
 }
 
-/* 스크롤바 스타일 */
+/* ── 스크롤바 ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -52,10 +102,18 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
+  background: var(--border);
   border-radius: 3px;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+/* ── 포커스 링 공통 ── */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ── 부드러운 전환 ── */
+a,
+button {
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
