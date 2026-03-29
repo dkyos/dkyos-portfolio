@@ -37,9 +37,11 @@ export function Timeline({ items }: TimelineProps) {
               <h3 className="mt-1 text-base font-semibold text-card-foreground">
                 {item.title}
               </h3>
-              <p className="text-sm font-medium text-muted-foreground">
-                {item.organization}
-              </p>
+              {item.organization && (
+                <p className="text-sm font-medium text-muted-foreground">
+                  {item.organization}
+                </p>
+              )}
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 {item.description}
               </p>

@@ -28,18 +28,16 @@ export default async function AdminLayout({
         <nav className="flex-1 space-y-1 px-2 py-3">
           <SidebarLink href="/admin" icon={LayoutDashboard} label="대시보드" />
           <SidebarLink href="/admin/posts" icon={FileText} label="글 관리" />
-        </nav>
-
-        <div className="border-t border-zinc-200 p-2 dark:border-zinc-800">
+          <div className="my-2 border-t border-zinc-200 dark:border-zinc-800" />
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             <ExternalLink size={16} />
             사이트 보기
           </Link>
           <AdminLogoutButton />
-        </div>
+        </nav>
       </aside>
 
       {/* 메인 콘텐츠 */}

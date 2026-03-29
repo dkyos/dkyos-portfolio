@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { profile } from "@/data/profile";
-import { timeline } from "@/data/timeline";
+import { timeline, lectures } from "@/data/timeline";
 import { Timeline } from "@/components/about/Timeline";
 import { siteConfig } from "@/lib/constants";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
@@ -56,6 +56,26 @@ export default function AboutPage() {
           이력
         </h2>
         <Timeline items={timeline} />
+      </section>
+
+      {/* 강의 경력 */}
+      <section className="mt-12">
+        <h2 className="mb-4 text-xl font-semibold tracking-tight text-foreground">
+          강의 경력
+        </h2>
+        <div className="flex flex-col gap-3">
+          {lectures.map((item, i) => (
+            <div
+              key={i}
+              className="rounded-lg border border-border bg-card px-4 py-3 shadow-sm"
+            >
+              <p className="font-medium text-card-foreground">{item.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {item.description}
+              </p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <JsonLdScript data={jsonLd} />
