@@ -68,6 +68,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       const supabase = createAuthBrowserClient();
 
+      // 공개 시에도 저장 먼저 수행 (자동 저장 후 공개)
       const postData = {
         slug: slug.trim(),
         title: title.trim(),
@@ -79,23 +80,21 @@ export function PostEditor({ initialData }: PostEditorProps) {
           .filter(Boolean),
         category: category.trim(),
         published,
-        published_at: published ? new Date().toISOString() : null,
+        ...(published && !initialData?.published
+          ? { published_at: new Date().toISOString() }
+          : {}),
       };
 
       if (isEditing && initialData) {
-        const updateData = { ...postData };
-        if (published && initialData.published) {
-          delete (updateData as Record<string, unknown>).published_at;
-        }
         const { error } = await supabase
           .from("posts")
-          .update(updateData)
+          .update(postData)
           .eq("id", initialData.id);
 
         if (error) {
           setMessage(`저장 실패: ${error.message}`);
         } else {
-          setMessage(published ? "글이 공개되었습니다." : "임시저장되었습니다.");
+          setMessage(published ? "저장 후 공개되었습니다." : "저장되었습니다.");
           router.refresh();
         }
       } else {
@@ -108,7 +107,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
         if (error) {
           setMessage(`저장 실패: ${error.message}`);
         } else {
-          setMessage(published ? "글이 공개되었습니다." : "임시저장되었습니다.");
+          setMessage(published ? "저장 후 공개되었습니다." : "저장되었습니다.");
           if (newPost) {
             router.push(`/admin/posts/${newPost.id}/edit`);
           }
@@ -171,7 +170,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
             className="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-            임시저장
+            저장
           </button>
           <button
             onClick={() => savePost(true)}

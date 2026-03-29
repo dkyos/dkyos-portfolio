@@ -33,7 +33,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-3 gap-4">
         <StatCard label="전체 글" count={totalPosts ?? 0} />
         <StatCard label="공개" count={publishedPosts ?? 0} />
-        <StatCard label="임시저장" count={draftPosts ?? 0} />
+        <StatCard label="비공개" count={draftPosts ?? 0} />
       </div>
     </div>
   );

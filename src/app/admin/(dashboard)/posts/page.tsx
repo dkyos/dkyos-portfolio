@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Eye } from "lucide-react";
 import { createAuthClient } from "@/lib/supabase/auth-server";
 import { formatDate } from "@/lib/format";
 import { DeletePostButton } from "@/components/admin/DeletePostButton";
+import { TogglePublishButton } from "@/components/admin/TogglePublishButton";
 
 export default async function AdminPostsPage() {
   const supabase = await createAuthClient();
@@ -62,15 +63,10 @@ export default async function AdminPostsPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    {post.published ? (
-                      <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
-                        <Eye size={14} /> 공개
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-zinc-500 dark:text-zinc-400">
-                        <EyeOff size={14} /> 임시저장
-                      </span>
-                    )}
+                    <TogglePublishButton
+                      postId={post.id}
+                      published={post.published}
+                    />
                   </td>
                   <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
                     {formatDate(post.updated_at)}
