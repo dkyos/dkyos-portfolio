@@ -101,17 +101,7 @@ export function PostContent({ content }: PostContentProps) {
     if (mermaidEls.length > 0) {
       loadScript(
         "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js",
-        () => {
-          const mermaid = (window as unknown as { mermaid: MermaidAPI })
-            .mermaid;
-          const isDark = document.documentElement.classList.contains("dark");
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: isDark ? "dark" : "default",
-            fontFamily: "inherit",
-          });
-          mermaid.run({ nodes: mermaidEls });
-        }
+        () => initMermaid(mermaidEls)
       );
     }
   }, [content, scripts]);
@@ -184,11 +174,29 @@ interface MermaidAPI {
 function loadScript(src: string, onLoad: () => void) {
   const existing = document.querySelector(`script[src="${src}"]`);
   if (existing) {
-    onLoad();
+    // 이미 로드됨 → 약간의 딜레이 후 실행 (초기화 대기)
+    setTimeout(onLoad, 50);
     return;
   }
   const script = document.createElement("script");
   script.src = src;
-  script.onload = onLoad;
+  script.onload = () => setTimeout(onLoad, 50);
   document.head.appendChild(script);
+}
+
+function initMermaid(nodes: NodeListOf<Element>, retries = 5) {
+  const mermaid = (window as unknown as { mermaid?: MermaidAPI }).mermaid;
+  if (!mermaid) {
+    if (retries > 0) {
+      setTimeout(() => initMermaid(nodes, retries - 1), 100);
+    }
+    return;
+  }
+  const isDark = document.documentElement.classList.contains("dark");
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: isDark ? "dark" : "default",
+    fontFamily: "inherit",
+  });
+  mermaid.run({ nodes });
 }
