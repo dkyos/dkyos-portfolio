@@ -17,3 +17,7 @@ export const siteConfig = {
     threads: "",
   },
 } as const;
+
+// 블로그 글 본문용 Prose 클래스 (PostContent, PostEditor 미리보기에서 공유)
+export const PROSE_CLASSES =
+  "prose prose-zinc max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-headings:leading-tight prose-headings:tracking-tight prose-p:leading-relaxed prose-li:leading-relaxed prose-a:text-foreground prose-a:underline-offset-4 prose-pre:bg-zinc-950 prose-pre:dark:bg-zinc-900 [&_.info-box]:my-4 [&_.info-box]:rounded-lg [&_.info-box]:border-l-4 [&_.info-box]:p-4 [&_.info-box.blue]:border-blue-500 [&_.info-box.blue]:bg-blue-50 dark:[&_.info-box.blue]:bg-blue-950/30 [&_.info-box.yellow]:border-yellow-500 [&_.info-box.yellow]:bg-yellow-50 dark:[&_.info-box.yellow]:bg-yellow-950/30 [&_.info-box.red]:border-red-500 [&_.info-box.red]:bg-red-50 dark:[&_.info-box.red]:bg-red-950/30 [&_.info-box.green]:border-green-500 [&_.info-box.green]:bg-green-50 dark:[&_.info-box.green]:bg-green-950/30";

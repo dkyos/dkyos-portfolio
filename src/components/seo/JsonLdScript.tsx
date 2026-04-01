@@ -9,7 +9,6 @@ export function JsonLdScript({ data }: { data: Record<string, unknown> }) {
   return (
     <script
       type="application/ld+json"
-      /* eslint-disable-next-line react/no-danger -- 서버 데이터를 JSON.stringify로 안전하게 직렬화 */
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />
   );

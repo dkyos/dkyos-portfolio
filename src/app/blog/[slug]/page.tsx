@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getPostBySlug, getAllSlugs, calculateReadingTime } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
 import { PostContent } from "@/components/blog/PostContent";
+import { ShareButton } from "@/components/blog/ShareButton";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { siteConfig } from "@/lib/constants";
 
@@ -139,15 +140,3 @@ export default async function BlogPostPage({ params }: PageProps) {
   );
 }
 
-function ShareButton({ platform, url }: { platform: string; url: string }) {
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-    >
-      {platform}
-    </a>
-  );
-}

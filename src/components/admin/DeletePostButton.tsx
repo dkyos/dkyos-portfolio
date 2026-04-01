@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
-import { createAuthBrowserClient } from "@/lib/supabase/auth-client";
+import { deletePost } from "@/app/admin/actions";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface DeletePostButtonProps {
@@ -14,14 +14,15 @@ interface DeletePostButtonProps {
 export function DeletePostButton({ postId, title }: DeletePostButtonProps) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleDelete() {
     setShowModal(false);
-    const supabase = createAuthBrowserClient();
-    const { error } = await supabase.from("posts").delete().eq("id", postId);
+    setError("");
+    const result = await deletePost(postId);
 
-    if (error) {
-      alert("삭제에 실패했습니다: " + error.message);
+    if (!result.success) {
+      setError(result.error ?? "삭제에 실패했습니다.");
       return;
     }
 
@@ -37,6 +38,10 @@ export function DeletePostButton({ postId, title }: DeletePostButtonProps) {
       >
         <Trash2 size={16} />
       </button>
+
+      {error && (
+        <span className="text-xs text-destructive">{error}</span>
+      )}
 
       <ConfirmModal
         open={showModal}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { createAuthBrowserClient } from "@/lib/supabase/auth-client";
+import { togglePublish } from "@/app/admin/actions";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface TogglePublishButtonProps {
@@ -17,23 +17,15 @@ export function TogglePublishButton({
 }: TogglePublishButtonProps) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleToggle() {
     setShowModal(false);
-    const supabase = createAuthBrowserClient();
-    const updateData: Record<string, unknown> = { published: !published };
+    setError("");
+    const result = await togglePublish(postId, published);
 
-    if (!published) {
-      updateData.published_at = new Date().toISOString();
-    }
-
-    const { error } = await supabase
-      .from("posts")
-      .update(updateData)
-      .eq("id", postId);
-
-    if (error) {
-      alert("상태 변경 실패: " + error.message);
+    if (!result.success) {
+      setError(result.error ?? "상태 변경에 실패했습니다.");
       return;
     }
 
@@ -61,6 +53,10 @@ export function TogglePublishButton({
           </>
         )}
       </button>
+
+      {error && (
+        <span className="text-xs text-destructive">{error}</span>
+      )}
 
       <ConfirmModal
         open={showModal}

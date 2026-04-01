@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, FileText, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, FileText, ExternalLink } from "lucide-react";
 import { getUser } from "@/lib/supabase/auth-server";
 import { AdminLogoutButton } from "@/components/admin/LogoutButton";
 
