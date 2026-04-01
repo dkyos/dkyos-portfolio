@@ -35,7 +35,7 @@ RC(Release Candidate) 환경이 불안정해서 개발자들이 테스트를 제
 <div class="mermaid">
 flowchart LR
     W1["1주차\n현황 정리"] --> W2["2주차\nRC3 안정화\n+ RC1,2 최신화"]
-    W2 --> W3["3주차\nStage 환경 구성\n(com.wadiz.web)"]
+    W2 --> W3["3주차\nStage 환경 구성\n(메인 웹 서비스)"]
     W3 --> W4["4주차\nStage 정기배포 활용\nRC1/RC2 DB 안정화"]
 </div>
 
@@ -116,7 +116,7 @@ ChatGPT가 전 세계를 휩쓸면서, 3월에 데이터 팀과 함께 **ChatGPT
 |------|------|
 | Filter/Servlet/Interceptor | web.xml의 5개 필터 구현 분석 |
 | 로그인/로그아웃 | 웹(ajaxLoginProcess)과 앱(/api/login) 분리 구조 |
-| 세션 구현 | WadizHttpSession — Redis 캐시 기반 커스텀 세션 |
+| 세션 구현 | 커스텀 HttpSession — Redis 캐시 기반 구현 |
 | wExternal | 앱→웹뷰 전환 시 인증 유지를 위한 토큰 구조 |
 
 <div class="info-box yellow">

@@ -52,7 +52,7 @@ gantt
 | 영역 | 의사결정 | 배경 |
 |------|---------|------|
 | **URL 전략** | 국가/언어별 path 분리 (`/global/...`) | SEO 최적화와 크롤러 대응 |
-| **도메인** | `wadiz.kr`(국내) + `wadiz.ai`(글로벌) 병렬 운영 | 서비스 독립성 확보 |
+| **도메인** | 국내 도메인 + 글로벌 도메인 병렬 운영 | 서비스 독립성 확보 |
 | **다국어 API** | Accept-Language 헤더 기반 | HTTP 표준 준수, 클라이언트 구현 단순화 |
 | **번역** | DeepL(기본) + Papago(Fallback) + GPT(품질 우선) 3중 구조 | 장애 대응 + 품질 보장 |
 | **결제** | Stripe 직접 연동 대신 PortOne 활용 | 마켓플레이스 구조에서 Stripe 직접 연동의 현실적 어려움 |
@@ -163,28 +163,28 @@ flowchart LR
 <div class="mermaid">
 flowchart TB
     subgraph FE["프론트엔드"]
-        FE1["wadiz-frontend\n(React + Next.js)"]
+        FE1["service-frontend\n(React + Next.js)"]
         FE2["makercenter-fe\n(React + CRA)"]
     end
     subgraph BE["백엔드 서비스"]
-        BE1["com.wadiz.api.funding\n(펀딩 API)"]
-        BE2["com.wadiz.api.relay\n(API Gateway)"]
-        BE3["com.wadiz.api.reward\n(리워드 API)"]
-        BE4["com.wadiz.wave.searcher\n(검색 서비스)"]
-        BE5["com.wadiz.ad.center\n(광고 센터)"]
+        BE1["api.funding\n(펀딩 API)"]
+        BE2["api.relay\n(API Gateway)"]
+        BE3["api.reward\n(리워드 API)"]
+        BE4["wave.searcher\n(검색 서비스)"]
+        BE5["ad.center\n(광고 센터)"]
     end
     subgraph BATCH["배치/인덱서"]
-        BA1["com.wadiz.wave.batch\n(리워드/투자/알림 배치)"]
+        BA1["wave.batch\n(리워드/투자/알림 배치)"]
         BA2["search.indexer-*\n(6개 검색 인덱서)"]
     end
     subgraph APP["앱"]
-        AP1["wadiz-android"]
-        AP2["wadiz-ios"]
+        AP1["service-android"]
+        AP2["service-ios"]
         AP3["app-api\n(NestJS)"]
     end
     subgraph INFRA["인프라/운영"]
         IN1["wa-infrastructure\n(Terraform/EKS)"]
-        IN2["wadiz-qa\n(Playwright 자동화)"]
+        IN2["service-qa\n(Playwright 자동화)"]
     end
 </div>
 
@@ -377,7 +377,7 @@ flowchart TB
 |------|------|
 | **AI 문서화 서비스** | 20개+ (FE, BE, 배치, 검색, 앱, QA 등) |
 | **주간 서비스 지표 리포트** | 40회+ (매주 금요일 자동 분석) |
-| **글로벌 서비스** | 5/7 정식 오픈, wadiz.ai 도메인 운영 |
+| **글로벌 서비스** | 5/7 정식 오픈, 글로벌 전용 도메인 운영 |
 | **AI 에이전트** | WAi Supporter + Maker + Generative Funding + 사후심사 + WAi 앱 |
 | **프로덕트발전회의** | 40회+ (매주 화/수 과제 조율) |
 | **글로벌 TF 미팅** | 20회+ (격주 CEO/CFO 참석) |
