@@ -75,8 +75,30 @@ export function PostContent({ content }: PostContentProps) {
   );
 }
 
+// TL;DR, 핵심 정리 등 GEO 인용 블록으로 인식할 헤딩 패턴
+const SUMMARY_HEADING_PATTERN =
+  /^(TL;?DR|핵심 ?정리|핵심 ?인사이트|배운 ?점|Key ?Takeaways?|Summary|결론|Conclusion)/i;
+
 // 커스텀 마크다운 컴포넌트
 const markdownComponents = {
+  h2: ({
+    children,
+    ...props
+  }: HTMLAttributes<HTMLHeadingElement> & { children?: ReactNode }) => {
+    const text = typeof children === "string" ? children : String(children);
+    if (SUMMARY_HEADING_PATTERN.test(text)) {
+      return (
+        <h2
+          {...props}
+          data-summary-heading=""
+          className="!mt-12 !mb-4 rounded-t-lg border-l-4 border-blue-500 bg-blue-50 px-4 py-2 dark:bg-blue-950/30"
+        >
+          {children}
+        </h2>
+      );
+    }
+    return <h2 {...props}>{children}</h2>;
+  },
   div: ({
     children,
     ...props

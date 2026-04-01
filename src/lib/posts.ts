@@ -77,6 +77,28 @@ export async function getAllSlugs(): Promise<string[]> {
   return (data ?? []).map((post) => post.slug);
 }
 
+// 관련 글 조회 (태그 기반, 현재 글 제외)
+export async function getRelatedPosts(
+  slug: string,
+  tags: string[],
+  limit: number = 3
+): Promise<Post[]> {
+  if (tags.length === 0) return [];
+
+  const allPosts = await getAllPosts();
+  return allPosts
+    .filter((post) => post.slug !== slug)
+    .map((post) => ({
+      post,
+      // 공통 태그 수로 관련도 계산
+      relevance: post.tags.filter((t) => tags.includes(t)).length,
+    }))
+    .filter(({ relevance }) => relevance > 0)
+    .sort((a, b) => b.relevance - a.relevance)
+    .slice(0, limit)
+    .map(({ post }) => post);
+}
+
 // 읽기 시간 계산 (한국어 기준 분당 약 500자)
 export function calculateReadingTime(content: string): string {
   const charCount = content.replace(/\s/g, "").length;

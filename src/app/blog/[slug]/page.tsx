@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { getPostBySlug, getAllSlugs, calculateReadingTime } from "@/lib/posts";
+import { getPostBySlug, getAllSlugs, getRelatedPosts, calculateReadingTime } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
 import { PostContent } from "@/components/blog/PostContent";
 import { ShareButton } from "@/components/blog/ShareButton";
 import { TagBadge } from "@/components/blog/TagBadge";
+import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
+import { extractFaqFromMarkdown, buildFaqJsonLd } from "@/lib/faq-extractor";
 import { siteConfig } from "@/lib/constants";
 
 interface PageProps {
@@ -72,6 +74,8 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
+  const relatedPosts = await getRelatedPosts(post.slug, post.tags);
+  const faqJsonLd = buildFaqJsonLd(extractFaqFromMarkdown(post.content));
   const ogImageUrl = `${siteConfig.url}/api/og?title=${encodeURIComponent(post.title)}`;
 
   const jsonLd = {
@@ -181,8 +185,12 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* 관련 글 */}
+      <RelatedPosts posts={relatedPosts} />
+
       <JsonLdScript data={jsonLd} />
       <JsonLdScript data={breadcrumbJsonLd} />
+      {faqJsonLd && <JsonLdScript data={faqJsonLd} />}
     </div>
   );
 }
