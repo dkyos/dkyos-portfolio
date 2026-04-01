@@ -36,3 +36,13 @@
 ```bash
 NODE_TLS_REJECT_UNAUTHORIZED=0 npx tsx scripts/publish-post.ts --file drafts/파일명.md
 ```
+
+## 회고 블로그 글 작성
+
+- Confluence에서 연간 활동 데이터를 수집하여 초안 작성
+- CQL 검색: `creator = "5d5cd2895a68ef0ca625626f" AND created >= "YYYY-01-01" AND created < "YYYY+1-01-01" AND type = page ORDER BY created ASC`
+- Confluence Cloud ID: `67ec6394-73cd-4285-a64d-a993093af906`
+- 기존 초안 참고: `drafts/` 폴더의 `20XX-*-retrospective.md` 파일들
+- 분량: 400\~500줄, Mermaid/info-box/표 적극 활용
+- `published_at` 날짜 규칙: N년 회고 → N+1년 1월 1일 (KST)
+- Supabase `posts` 테이블, `slug` 기준 upsert
