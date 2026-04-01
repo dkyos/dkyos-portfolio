@@ -8,6 +8,9 @@ import { JsonLdScript } from "@/components/seo/JsonLdScript";
 export const metadata: Metadata = {
   title: "소개",
   description: `${profile.name} - ${profile.role}. ${profile.bio}`,
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function AboutPage() {

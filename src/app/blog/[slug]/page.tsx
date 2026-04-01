@@ -26,6 +26,9 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    alternates: {
+      canonical: `${siteConfig.url}/blog/${slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
@@ -40,6 +43,16 @@ export async function generateMetadata({
       title: post.title,
       description: post.description,
       images: [ogImageUrl],
+    },
+    other: {
+      // GEO: AI 검색엔진 인용 최적화
+      "citation_title": post.title,
+      "citation_author": siteConfig.author.name,
+      "citation_publication_date": post.published_at ?? "",
+      "citation_language": siteConfig.language,
+      ...(post.tags.length > 0 && {
+        "article:tag": post.tags.join(", "),
+      }),
     },
   };
 }
@@ -59,21 +72,58 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
+  const ogImageUrl = `${siteConfig.url}/api/og?title=${encodeURIComponent(post.title)}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
+    image: post.cover_image || ogImageUrl,
     datePublished: post.published_at,
     dateModified: post.updated_at,
+    url: `${siteConfig.url}/blog/${post.slug}`,
     author: {
       "@type": "Person",
       name: siteConfig.author.name,
+      url: siteConfig.url,
     },
     publisher: {
       "@type": "Person",
       name: siteConfig.author.name,
+      url: siteConfig.url,
     },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/blog/${post.slug}`,
+    },
+    inLanguage: siteConfig.language,
+    ...(post.tags.length > 0 && { keywords: post.tags.join(", ") }),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "홈",
+        item: siteConfig.url,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "블로그",
+        item: `${siteConfig.url}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${siteConfig.url}/blog/${post.slug}`,
+      },
+    ],
   };
 
   return (
@@ -132,6 +182,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       </div>
 
       <JsonLdScript data={jsonLd} />
+      <JsonLdScript data={breadcrumbJsonLd} />
     </div>
   );
 }

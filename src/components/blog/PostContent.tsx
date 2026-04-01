@@ -3,7 +3,8 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { useEffect, useRef, useMemo, type ReactNode, type HTMLAttributes } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useMemo, type ReactNode, type HTMLAttributes, type ImgHTMLAttributes } from "react";
 import { parseContent, parseChartStyle } from "@/lib/markdown-parser";
 import { loadScript, initMermaid, MERMAID_CDN, CHARTJS_CDN } from "@/lib/cdn-loader";
 import { PROSE_CLASSES } from "@/lib/constants";
@@ -74,7 +75,7 @@ export function PostContent({ content }: PostContentProps) {
   );
 }
 
-// div에 className을 보존하는 커스텀 컴포넌트
+// 커스텀 마크다운 컴포넌트
 const markdownComponents = {
   div: ({
     children,
@@ -82,4 +83,18 @@ const markdownComponents = {
   }: HTMLAttributes<HTMLDivElement> & { children?: ReactNode }) => (
     <div {...props}>{children}</div>
   ),
+  img: ({ src, alt }: ImgHTMLAttributes<HTMLImageElement>) => {
+    if (!src || typeof src !== "string") return null;
+    return (
+      <Image
+        src={src}
+        alt={alt || "블로그 이미지"}
+        width={768}
+        height={432}
+        className="rounded-lg"
+        sizes="(max-width: 768px) 100vw, 768px"
+        style={{ width: "100%", height: "auto" }}
+      />
+    );
+  },
 };

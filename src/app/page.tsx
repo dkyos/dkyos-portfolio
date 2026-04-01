@@ -3,11 +3,26 @@ import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/constants";
 import { getRecentPosts } from "@/lib/posts";
 import { PostCard } from "@/components/blog/PostCard";
+import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
 export const revalidate = 60;
 
 export default async function Home() {
   const recentPosts = await getRecentPosts(5);
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    author: {
+      "@type": "Person",
+      name: siteConfig.author.name,
+      url: siteConfig.url,
+    },
+    inLanguage: siteConfig.language,
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-6">
@@ -60,6 +75,8 @@ export default async function Home() {
           </div>
         )}
       </section>
+
+      <JsonLdScript data={websiteJsonLd} />
     </div>
   );
 }

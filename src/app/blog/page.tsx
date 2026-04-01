@@ -4,11 +4,16 @@ import { X } from "lucide-react";
 import { getAllPosts } from "@/lib/posts";
 import { PostCard } from "@/components/blog/PostCard";
 import { TagBadge } from "@/components/blog/TagBadge";
+import { JsonLdScript } from "@/components/seo/JsonLdScript";
+import { siteConfig } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "블로그",
   description:
     "소프트웨어 개발, 웹 기술, AI 등 다양한 기술 주제에 대한 글을 공유합니다.",
+  alternates: {
+    canonical: "/blog",
+  },
 };
 
 export const revalidate = 60;
@@ -36,6 +41,24 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const posts = tag
     ? allPosts.filter((post) => post.tags.includes(tag))
     : allPosts;
+
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "블로그",
+    description:
+      "소프트웨어 개발, 웹 기술, AI 등 다양한 기술 주제에 대한 글을 공유합니다.",
+    url: `${siteConfig.url}/blog`,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: allPosts.slice(0, 10).map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `${siteConfig.url}/blog/${post.slug}`,
+        name: post.title,
+      })),
+    },
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
@@ -85,6 +108,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
           ))}
         </div>
       )}
+
+      <JsonLdScript data={collectionJsonLd} />
     </div>
   );
 }

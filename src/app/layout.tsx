@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
+  authors: [{ name: siteConfig.author.name, url: siteConfig.url }],
+  creator: siteConfig.author.name,
+  publisher: siteConfig.author.name,
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
@@ -48,9 +51,15 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
+    canonical: siteConfig.url,
     types: {
       "application/rss+xml": `${siteConfig.url}/feed.xml`,
     },
+  },
+  other: {
+    // GEO: AI 검색엔진 인용 최적화
+    "citation_author": siteConfig.author.name,
+    "citation_language": siteConfig.language,
   },
 };
 
