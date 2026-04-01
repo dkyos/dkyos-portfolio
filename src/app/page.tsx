@@ -32,12 +32,6 @@ export default async function Home() {
             블로그 보기
             <ArrowRight size={16} />
           </Link>
-          <Link
-            href="/about"
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground"
-          >
-            소개
-          </Link>
         </div>
       </section>
 

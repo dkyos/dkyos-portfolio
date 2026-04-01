@@ -7,7 +7,6 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 const navItems = [
   { href: "/", label: "홈" },
   { href: "/blog", label: "블로그" },
-  { href: "/about", label: "소개" },
 ];
 
 export function Header() {
