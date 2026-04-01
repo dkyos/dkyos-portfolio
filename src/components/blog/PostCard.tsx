@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Post } from "@/lib/supabase/types";
 import { formatDate } from "@/lib/format";
+import { TagBadge } from "@/components/blog/TagBadge";
 
 interface PostCardProps {
   post: Post;
@@ -16,31 +17,24 @@ export function PostCard({ post }: PostCardProps) {
         <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
           {post.description}
         </p>
-        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          {post.published_at && (
-            <>
-              <time dateTime={post.published_at}>
-                {formatDate(post.published_at)}
-              </time>
-            </>
-          )}
-          {post.tags.length > 0 && (
-            <>
-              {post.published_at && <span>&middot;</span>}
-              <div className="flex gap-1.5">
-                {post.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
       </Link>
+      <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+        {post.published_at && (
+          <time dateTime={post.published_at}>
+            {formatDate(post.published_at)}
+          </time>
+        )}
+        {post.tags.length > 0 && (
+          <>
+            {post.published_at && <span>&middot;</span>}
+            <div className="flex gap-1.5">
+              {post.tags.slice(0, 3).map((tag) => (
+                <TagBadge key={tag} tag={tag} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </article>
   );
 }

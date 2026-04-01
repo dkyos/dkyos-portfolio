@@ -6,6 +6,7 @@ import { getPostBySlug, getAllSlugs, calculateReadingTime } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
 import { PostContent } from "@/components/blog/PostContent";
 import { ShareButton } from "@/components/blog/ShareButton";
+import { TagBadge } from "@/components/blog/TagBadge";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { siteConfig } from "@/lib/constants";
 
@@ -104,12 +105,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           {post.tags.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground"
-                >
-                  {tag}
-                </span>
+                <TagBadge key={tag} tag={tag} />
               ))}
             </div>
           )}
