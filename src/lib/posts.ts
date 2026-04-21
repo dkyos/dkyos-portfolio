@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { createReadOnlyClient } from "@/lib/supabase/server";
 import type { Post } from "@/lib/supabase/types";
 
@@ -6,24 +7,28 @@ import type { Post } from "@/lib/supabase/types";
 const LIST_COLUMNS =
   "id, slug, title, description, tags, category, cover_image, published, published_at, created_at, updated_at" as const;
 
-// 게시된 글 전체 조회 (최신순, content 제외)
-export async function getAllPosts(): Promise<Post[]> {
-  const supabase = createReadOnlyClient();
-  if (!supabase) return [];
+// 동적 렌더링 페이지(searchParams 사용)에서도 DB 호출을 재사용하도록 데이터 레벨 캐시 적용
+export const getAllPosts = unstable_cache(
+  async (): Promise<Post[]> => {
+    const supabase = createReadOnlyClient();
+    if (!supabase) return [];
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select(LIST_COLUMNS)
-    .eq("published", true)
-    .order("published_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("posts")
+      .select(LIST_COLUMNS)
+      .eq("published", true)
+      .order("published_at", { ascending: false });
 
-  if (error) {
-    console.error("글 목록 조회 실패:", error);
-    return [];
-  }
+    if (error) {
+      console.error("글 목록 조회 실패:", error);
+      return [];
+    }
 
-  return (data ?? []) as Post[];
-}
+    return (data ?? []) as Post[];
+  },
+  ["posts:list:published"],
+  { revalidate: 60, tags: ["posts"] }
+);
 
 // 슬러그로 단일 글 조회 (cache로 동일 요청 내 중복 호출 방지)
 export const getPostBySlug = cache(
