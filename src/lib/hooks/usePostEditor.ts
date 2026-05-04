@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-client";
+import { revalidateAfterSave } from "@/app/admin/actions";
 
 export interface PostFormData {
   id?: string;
@@ -29,6 +30,7 @@ export function usePostEditor({ initialData }: UsePostEditorOptions = {}) {
   const [content, setContent] = useState(initialData?.content ?? "");
   const [tags, setTags] = useState(initialData?.tags?.join(", ") ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
+  const [published, setPublished] = useState(initialData?.published ?? false);
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -49,7 +51,7 @@ export function usePostEditor({ initialData }: UsePostEditorOptions = {}) {
   }
 
   const savePost = useCallback(
-    async (published: boolean) => {
+    async (publishOverride?: boolean) => {
       if (!title.trim()) {
         setMessage("제목을 입력해주세요.");
         return;
@@ -59,15 +61,19 @@ export function usePostEditor({ initialData }: UsePostEditorOptions = {}) {
         return;
       }
 
-      const isSave = !published;
-      if (isSave) setSaving(true);
-      else setPublishing(true);
+      const willPublish =
+        publishOverride !== undefined ? publishOverride : published;
+      const publishStateChanged = publishOverride !== undefined;
+
+      if (publishStateChanged) setPublishing(true);
+      else setSaving(true);
       setMessage("");
 
       const supabase = createAuthBrowserClient();
+      const trimmedSlug = slug.trim();
 
       const postData = {
-        slug: slug.trim(),
+        slug: trimmedSlug,
         title: title.trim(),
         description: description.trim(),
         content,
@@ -76,46 +82,70 @@ export function usePostEditor({ initialData }: UsePostEditorOptions = {}) {
           .map((t) => t.trim())
           .filter(Boolean),
         category: category.trim(),
-        published,
-        ...(published && !initialData?.published
+        published: willPublish,
+        ...(willPublish && !initialData?.published
           ? { published_at: new Date().toISOString() }
           : {}),
       };
+
+      let saveError: string | null = null;
+      let newPostId: string | null = null;
 
       if (isEditing && initialData) {
         const { error } = await supabase
           .from("posts")
           .update(postData)
           .eq("id", initialData.id!);
-
-        if (error) {
-          setMessage(`저장 실패: ${error.message}`);
-        } else {
-          setMessage(published ? "저장 후 공개되었습니다." : "저장되었습니다.");
-          router.refresh();
-        }
+        if (error) saveError = error.message;
       } else {
         const { data: newPost, error } = await supabase
           .from("posts")
           .insert(postData)
           .select("id")
           .single();
+        if (error) saveError = error.message;
+        else if (newPost) newPostId = newPost.id;
+      }
 
-        if (error) {
-          setMessage(`저장 실패: ${error.message}`);
-        } else {
-          setMessage(published ? "저장 후 공개되었습니다." : "저장되었습니다.");
-          if (newPost) {
-            router.push(`/admin/posts/${newPost.id}/edit`);
-          }
-          router.refresh();
-        }
+      if (saveError) {
+        setMessage(`저장 실패: ${saveError}`);
+        setSaving(false);
+        setPublishing(false);
+        return;
+      }
+
+      setPublished(willPublish);
+
+      if (publishStateChanged) {
+        setMessage(willPublish ? "공개되었습니다." : "비공개로 전환되었습니다.");
+      } else {
+        setMessage("저장되었습니다.");
+      }
+
+      // ISR 캐시 무효화 (블로그 리스트/개별 글/관리 목록)
+      await revalidateAfterSave(trimmedSlug);
+
+      if (newPostId) {
+        router.push(`/admin/posts/${newPostId}/edit`);
+      } else {
+        router.refresh();
       }
 
       setSaving(false);
       setPublishing(false);
     },
-    [title, slug, description, content, tags, category, isEditing, initialData, router]
+    [
+      title,
+      slug,
+      description,
+      content,
+      tags,
+      category,
+      published,
+      isEditing,
+      initialData,
+      router,
+    ]
   );
 
   return {
@@ -132,6 +162,7 @@ export function usePostEditor({ initialData }: UsePostEditorOptions = {}) {
     setTags,
     category,
     setCategory,
+    published,
     // UI 상태
     showPreview,
     setShowPreview,

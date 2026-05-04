@@ -19,10 +19,11 @@ export function PostEditor({ initialData }: PostEditorProps) {
         showPreview={editor.showPreview}
         saving={editor.saving}
         publishing={editor.publishing}
+        published={editor.published}
         message={editor.message}
         onTogglePreview={() => editor.setShowPreview(!editor.showPreview)}
-        onSave={() => editor.savePost(false)}
-        onPublish={() => editor.savePost(true)}
+        onSave={() => editor.savePost()}
+        onTogglePublish={() => editor.savePost(!editor.published)}
       />
 
       <EditorMeta

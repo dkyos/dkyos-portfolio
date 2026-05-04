@@ -52,3 +52,14 @@ export async function togglePublish(
   revalidatePath("/blog");
   return { success: true };
 }
+
+// 저장 후 캐시 무효화 (글 목록/블로그/개별 글)
+export async function revalidateAfterSave(slug?: string): Promise<ActionResult> {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  revalidatePath("/admin/posts");
+  revalidatePath("/blog");
+  if (slug) revalidatePath(`/blog/${slug}`);
+  return { success: true };
+}
