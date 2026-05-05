@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getPostBySlug, getAllSlugs, getRelatedPosts, calculateReadingTime } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
 import { PostContent } from "@/components/blog/PostContent";
-import { ShareButton } from "@/components/blog/ShareButton";
+import { ShareSection } from "@/components/share/ShareSection";
 import { TagBadge } from "@/components/blog/TagBadge";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
@@ -182,20 +182,12 @@ export default async function BlogPostPage({ params }: PageProps) {
       </article>
 
       {/* 소셜 공유 */}
-      <div className="mt-16 rounded-xl border border-border bg-card p-6 shadow-sm">
-        <p className="mb-3 text-sm font-medium text-card-foreground">
-          공유하기
-        </p>
-        <div className="flex gap-3">
-          <ShareButton
-            platform="LinkedIn"
-            url={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${siteConfig.url}/blog/${post.slug}`)}`}
-          />
-          <ShareButton
-            platform="Facebook"
-            url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${siteConfig.url}/blog/${post.slug}`)}`}
-          />
-        </div>
+      <div className="mt-16">
+        <ShareSection
+          url={`${siteConfig.url}/blog/${post.slug}`}
+          title={post.title}
+          variant="card"
+        />
       </div>
 
       {/* 관련 글 */}

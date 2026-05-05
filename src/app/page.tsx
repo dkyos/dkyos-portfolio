@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/constants";
 import { getRecentPosts } from "@/lib/posts";
 import { PostCard } from "@/components/blog/PostCard";
+import { ShareSection } from "@/components/share/ShareSection";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
 export const revalidate = 60;
@@ -37,7 +38,7 @@ export default async function Home() {
           웹·AI·소프트웨어 엔지니어링에 대해
           매일 조금씩 더 잘하기 위한 기록.
         </p>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -45,6 +46,12 @@ export default async function Home() {
             블로그 보기
             <ArrowRight size={16} />
           </Link>
+          <ShareSection
+            url={siteConfig.url}
+            title={siteConfig.title}
+            variant="compact"
+            label="이 사이트 공유하기"
+          />
         </div>
       </section>
 

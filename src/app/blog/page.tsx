@@ -4,6 +4,7 @@ import { getAllPosts } from "@/lib/posts";
 import { PostCard } from "@/components/blog/PostCard";
 import { TagFilter } from "@/components/blog/TagFilter";
 import { Pagination } from "@/components/blog/Pagination";
+import { ShareSection } from "@/components/share/ShareSection";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { siteConfig } from "@/lib/constants";
 
@@ -106,12 +107,22 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-        블로그
-      </h1>
-      <p className="mb-6 text-muted-foreground">
-        기술과 개발에 대한 생각을 기록합니다.
-      </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
+            블로그
+          </h1>
+          <p className="text-muted-foreground">
+            기술과 개발에 대한 생각을 기록합니다.
+          </p>
+        </div>
+        <ShareSection
+          url={`${siteConfig.url}/blog`}
+          title={`${siteConfig.name} 블로그`}
+          variant="compact"
+          label="블로그 공유하기"
+        />
+      </div>
 
       {/* 태그 필터 */}
       <TagFilter
