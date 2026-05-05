@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { profile } from "@/data/profile";
 import { timeline, lectures } from "@/data/timeline";
 import { Timeline } from "@/components/about/Timeline";
-import { siteConfig } from "@/lib/constants";
+import { siteConfig, authorSameAs } from "@/lib/constants";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
 export const metadata: Metadata = {
@@ -21,8 +21,9 @@ export default function AboutPage() {
     alternateName: profile.nameEn,
     jobTitle: profile.role,
     description: profile.bio,
-    url: siteConfig.url,
+    url: `${siteConfig.url}/about`,
     knowsAbout: [...profile.skills],
+    ...(authorSameAs.length > 0 && { sameAs: authorSameAs }),
   };
 
   return (

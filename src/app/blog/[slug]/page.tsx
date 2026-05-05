@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { getPostBySlug, getAllSlugs, getRelatedPosts, calculateReadingTime } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
 import { PostContent } from "@/components/blog/PostContent";
@@ -9,8 +7,9 @@ import { ShareButton } from "@/components/blog/ShareButton";
 import { TagBadge } from "@/components/blog/TagBadge";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
+import { Breadcrumb } from "@/components/blog/Breadcrumb";
 import { extractFaqFromMarkdown, buildFaqJsonLd } from "@/lib/faq-extractor";
-import { siteConfig } from "@/lib/constants";
+import { siteConfig, authorSameAs } from "@/lib/constants";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -78,6 +77,12 @@ export default async function BlogPostPage({ params }: PageProps) {
   const faqJsonLd = buildFaqJsonLd(extractFaqFromMarkdown(post.content));
   const ogImageUrl = `${siteConfig.url}/api/og?title=${encodeURIComponent(post.title)}`;
 
+  // GEO: 본문 단어 수 — 한글은 공백 기준이 어색하므로 글자 수도 같이 기록
+  const wordCount = post.content
+    .replace(/```[\s\S]*?```/g, "") // 코드 블록 제외
+    .split(/\s+/)
+    .filter(Boolean).length;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -90,7 +95,8 @@ export default async function BlogPostPage({ params }: PageProps) {
     author: {
       "@type": "Person",
       name: siteConfig.author.name,
-      url: siteConfig.url,
+      url: `${siteConfig.url}/about`,
+      ...(authorSameAs.length > 0 && { sameAs: authorSameAs }),
     },
     publisher: {
       "@type": "Person",
@@ -102,7 +108,14 @@ export default async function BlogPostPage({ params }: PageProps) {
       "@id": `${siteConfig.url}/blog/${post.slug}`,
     },
     inLanguage: siteConfig.language,
+    wordCount,
+    ...(post.category && { articleSection: post.category }),
     ...(post.tags.length > 0 && { keywords: post.tags.join(", ") }),
+    // 음성 검색 / Google Assistant 노출용 (제목과 첫 본문 단락)
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "article p:first-of-type"],
+    },
   };
 
   const breadcrumbJsonLd = {
@@ -132,13 +145,13 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <Link
-        href="/blog"
-        className="-ml-2 mb-8 inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        <ArrowLeft size={14} />
-        블로그로 돌아가기
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "홈", href: "/" },
+          { label: "블로그", href: "/blog" },
+          { label: post.title },
+        ]}
+      />
 
       <article>
         <header className="mb-10 border-b border-border pb-8">

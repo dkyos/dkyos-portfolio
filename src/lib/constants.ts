@@ -1,9 +1,9 @@
 export const siteConfig = {
   name: "DKyos",
-  title: "DKyos - 개발자 포트폴리오",
+  title: "DKyos — Build. Ship. Reflect.",
   description:
-    "윤동균의 기술 블로그 및 포트폴리오. 소프트웨어 개발, 웹 기술, AI 등 다양한 기술 주제를 다룹니다.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://dkyos.vercel.app",
+    "웹·AI·소프트웨어 엔지니어링에 대해 매일 조금씩 더 잘하기 위한 기록. 시스템 설계 결정, AI Native 워크플로, 회고를 정리합니다.",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://blog.dkyos.com",
   author: {
     name: "윤동균",
     nameEn: "Dongkyun Yun",
@@ -16,7 +16,19 @@ export const siteConfig = {
     linkedin: "",
     threads: "",
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
+    naver: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION || "",
+  },
 } as const;
+
+/**
+ * 저자의 외부 프로필 URL 목록 (sameAs 용).
+ * 빈 문자열은 자동 필터링되므로 미사용 플랫폼은 그대로 두어도 안전.
+ */
+export const authorSameAs: string[] = (
+  Object.values(siteConfig.links) as string[]
+).filter((v) => v.length > 0);
 
 // 블로그 글 본문용 Prose 클래스 (PostContent, PostEditor 미리보기에서 공유)
 export const PROSE_CLASSES =

@@ -7,21 +7,38 @@ import { Pagination } from "@/components/blog/Pagination";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { siteConfig } from "@/lib/constants";
 
-export const metadata: Metadata = {
-  title: "블로그",
-  description:
-    "소프트웨어 개발, 웹 기술, AI 등 다양한 기술 주제에 대한 글을 공유합니다.",
-  alternates: {
-    canonical: "/blog",
-  },
-};
-
 export const revalidate = 60;
 
 const POSTS_PER_PAGE = 10;
 
 interface PageProps {
   searchParams: Promise<{ tag?: string; page?: string }>;
+}
+
+/**
+ * 페이지네이션·태그 필터링된 결과는 검색엔진 진입로로 적합하지 않다.
+ * - tag 또는 page>1: noindex (중복 콘텐츠 방지)
+ * - 기본 /blog: index, canonical=/blog
+ */
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const { tag, page: pageParam } = await searchParams;
+  const page = pageParam ? Number(pageParam) : 1;
+  const isFiltered = !!tag || (Number.isInteger(page) && page > 1);
+
+  return {
+    title: tag ? `${tag} 태그` : "블로그",
+    description: tag
+      ? `${tag} 태그가 달린 모든 글 모음.`
+      : "소프트웨어 개발, 웹 기술, AI 등 다양한 기술 주제에 대한 글을 공유합니다.",
+    alternates: {
+      canonical: "/blog",
+    },
+    ...(isFiltered && {
+      robots: { index: false, follow: true },
+    }),
+  };
 }
 
 export default async function BlogPage({ searchParams }: PageProps) {

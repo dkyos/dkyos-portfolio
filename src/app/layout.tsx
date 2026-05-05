@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
@@ -6,6 +6,16 @@ import { Footer } from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import { siteConfig } from "@/lib/constants";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +65,16 @@ export const metadata: Metadata = {
     types: {
       "application/rss+xml": `${siteConfig.url}/feed.xml`,
     },
+  },
+  verification: {
+    ...(siteConfig.verification.google && {
+      google: siteConfig.verification.google,
+    }),
+    ...(siteConfig.verification.naver && {
+      other: {
+        "naver-site-verification": siteConfig.verification.naver,
+      },
+    }),
   },
   other: {
     // GEO: AI 검색엔진 인용 최적화
