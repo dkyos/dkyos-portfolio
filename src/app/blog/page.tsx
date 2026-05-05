@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { X } from "lucide-react";
 import { getAllPosts } from "@/lib/posts";
 import { PostCard } from "@/components/blog/PostCard";
-import { TagBadge } from "@/components/blog/TagBadge";
+import { TagFilter } from "@/components/blog/TagFilter";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { siteConfig } from "@/lib/constants";
 
@@ -26,7 +24,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const { tag } = await searchParams;
   const allPosts = await getAllPosts();
 
-  // 전체 태그 목록 (빈도순 정렬)
+  // 전체 태그 목록 (빈도순 정렬, 카운트 포함)
   const tagCounts = new Map<string, number>();
   for (const post of allPosts) {
     for (const t of post.tags) {
@@ -34,8 +32,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
     }
   }
   const allTags = [...tagCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([t]) => t);
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name, count]) => ({ name, count }));
 
   // 태그 필터링
   const posts = tag
@@ -70,22 +68,11 @@ export default async function BlogPage({ searchParams }: PageProps) {
       </p>
 
       {/* 태그 필터 */}
-      {allTags.length > 0 && (
-        <div className="mb-8 flex flex-wrap items-center gap-2">
-          {tag && (
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/10"
-            >
-              <X size={12} />
-              초기화
-            </Link>
-          )}
-          {allTags.map((t) => (
-            <TagBadge key={t} tag={t} active={t === tag} />
-          ))}
-        </div>
-      )}
+      <TagFilter
+        tags={allTags}
+        activeTag={tag}
+        totalCount={allPosts.length}
+      />
 
       {/* 필터 결과 안내 */}
       {tag && (
