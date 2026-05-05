@@ -158,16 +158,24 @@ export default async function BlogPostPage({ params }: PageProps) {
           <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground">
             {post.title}
           </h1>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {post.published_at && (
-              <>
-                <time dateTime={post.published_at}>
-                  {formatDate(post.published_at)}
-                </time>
-                <span>&middot;</span>
-              </>
-            )}
-            <span>{calculateReadingTime(post.content)}</span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {post.published_at && (
+                <>
+                  <time dateTime={post.published_at}>
+                    {formatDate(post.published_at)}
+                  </time>
+                  <span>&middot;</span>
+                </>
+              )}
+              <span>{calculateReadingTime(post.content)}</span>
+            </div>
+            <ShareSection
+              url={`${siteConfig.url}/blog/${post.slug}`}
+              title={post.title}
+              variant="compact"
+              label="이 글 공유하기"
+            />
           </div>
           {post.tags.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
@@ -180,15 +188,6 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         <PostContent content={post.content} />
       </article>
-
-      {/* 소셜 공유 */}
-      <div className="mt-16">
-        <ShareSection
-          url={`${siteConfig.url}/blog/${post.slug}`}
-          title={post.title}
-          variant="card"
-        />
-      </div>
 
       {/* 관련 글 */}
       <RelatedPosts posts={relatedPosts} />
