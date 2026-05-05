@@ -28,16 +28,14 @@ export default async function Home() {
     <div className="mx-auto max-w-3xl px-6">
       {/* 히어로 섹션 */}
       <section className="py-24">
-        <p className="mb-3 text-sm font-medium text-muted-foreground">
-          안녕하세요, 저는
-        </p>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground">
-          {siteConfig.author.name}
-          <span className="text-muted-foreground">입니다.</span>
+        <h1 className="mb-4 text-5xl font-bold tracking-tight text-foreground sm:text-6xl">
+          Build.{" "}
+          <span className="text-muted-foreground">Ship.</span>{" "}
+          <span className="text-muted-foreground">Reflect.</span>
         </h1>
         <p className="mb-8 max-w-lg text-lg leading-relaxed text-muted-foreground">
-          소프트웨어 개발자로서 다양한 기술 경험과 인사이트를 공유합니다. 웹
-          기술, AI, 그리고 소프트웨어 엔지니어링에 관심이 많습니다.
+          웹·AI·소프트웨어 엔지니어링에 대해
+          매일 조금씩 더 잘하기 위한 기록.
         </p>
         <div className="flex gap-4">
           <Link
