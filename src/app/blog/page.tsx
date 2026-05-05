@@ -28,13 +28,48 @@ export async function generateMetadata({
   const page = pageParam ? Number(pageParam) : 1;
   const isFiltered = !!tag || (Number.isInteger(page) && page > 1);
 
+  const title = tag ? `${tag} 태그` : "블로그";
+  const description = tag
+    ? `${tag} 태그가 달린 모든 글을 모았습니다. 웹·AI·소프트웨어 엔지니어링 관련 글들을 함께 둘러보세요.`
+    : "웹·AI·소프트웨어 엔지니어링에 대해 매일 조금씩 더 잘하기 위한 기록. 시스템 설계 결정과 회고를 정리합니다.";
+
+  const ogParams = new URLSearchParams({
+    title: tag ? `#${tag}` : "블로그",
+    desc: description,
+    section: "Blog",
+  });
+  const ogImageUrl = `${siteConfig.url}/api/og?${ogParams.toString()}`;
+  const url = tag ? `${siteConfig.url}/blog?tag=${encodeURIComponent(tag)}` : `${siteConfig.url}/blog`;
+
   return {
-    title: tag ? `${tag} 태그` : "블로그",
-    description: tag
-      ? `${tag} 태그가 달린 모든 글 모음.`
-      : "소프트웨어 개발, 웹 기술, AI 등 다양한 기술 주제에 대한 글을 공유합니다.",
+    title,
+    description,
     alternates: {
       canonical: "/blog",
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url,
+      siteName: siteConfig.name,
+      locale: siteConfig.locale,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${title} — ${siteConfig.name}`,
+          type: "image/png",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [{ url: ogImageUrl, alt: title }],
+      creator: siteConfig.author.name,
     },
     ...(isFiltered && {
       robots: { index: false, follow: true },

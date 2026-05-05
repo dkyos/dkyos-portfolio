@@ -9,6 +9,7 @@ import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { Breadcrumb } from "@/components/blog/Breadcrumb";
 import { extractFaqFromMarkdown, buildFaqJsonLd } from "@/lib/faq-extractor";
+import { resolveDescription } from "@/lib/summary";
 import { siteConfig, authorSameAs } from "@/lib/constants";
 
 interface PageProps {
@@ -22,28 +23,67 @@ export async function generateMetadata({
   const post = await getPostBySlug(slug);
   if (!post) return {};
 
-  const ogImageUrl = `${siteConfig.url}/api/og?title=${encodeURIComponent(post.title)}`;
+  // description fallback: 비었거나 짧으면 본문에서 자동 추출
+  const description = resolveDescription({
+    description: post.description,
+    content: post.content,
+    fallback: siteConfig.description,
+    minLength: 60,
+    maxLength: 200,
+  });
+
+  // OG 이미지에 풍부한 메타 — 제목·요약·태그·날짜·읽는시간·섹션
+  const readingTime = calculateReadingTime(post.content);
+  const ogDate = post.published_at
+    ? new Date(post.published_at).toISOString().slice(0, 10)
+    : "";
+  const ogParams = new URLSearchParams({
+    title: post.title,
+    desc: description.length > 160 ? description.slice(0, 157) + "…" : description,
+    ...(post.tags.length > 0 && { tags: post.tags.slice(0, 4).join(",") }),
+    ...(ogDate && { date: ogDate }),
+    ...(readingTime && { reading: readingTime }),
+    ...(post.category && { section: post.category }),
+  });
+  const ogImageUrl = `${siteConfig.url}/api/og?${ogParams.toString()}`;
+  const url = `${siteConfig.url}/blog/${slug}`;
 
   return {
     title: post.title,
-    description: post.description,
+    description,
+    keywords: post.tags,
+    authors: [{ name: siteConfig.author.name, url: `${siteConfig.url}/about` }],
     alternates: {
-      canonical: `${siteConfig.url}/blog/${slug}`,
+      canonical: url,
     },
     openGraph: {
       title: post.title,
-      description: post.description,
+      description,
       type: "article",
-      publishedTime: post.published_at ?? undefined,
-      authors: [siteConfig.author.name],
+      url,
+      siteName: siteConfig.name,
       locale: siteConfig.locale,
-      images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+      publishedTime: post.published_at ?? undefined,
+      modifiedTime: post.updated_at ?? undefined,
+      authors: [siteConfig.author.name],
+      ...(post.category && { section: post.category }),
+      ...(post.tags.length > 0 && { tags: [...post.tags] }),
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${post.title} — ${siteConfig.name}`,
+          type: "image/png",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.description,
-      images: [ogImageUrl],
+      description,
+      images: [{ url: ogImageUrl, alt: post.title }],
+      creator: siteConfig.author.name,
     },
     other: {
       // GEO: AI 검색엔진 인용 최적화
@@ -51,6 +91,7 @@ export async function generateMetadata({
       "citation_author": siteConfig.author.name,
       "citation_publication_date": post.published_at ?? "",
       "citation_language": siteConfig.language,
+      ...(post.category && { "article:section": post.category }),
       ...(post.tags.length > 0 && {
         "article:tag": post.tags.join(", "),
       }),
@@ -75,7 +116,28 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const relatedPosts = await getRelatedPosts(post.slug, post.tags);
   const faqJsonLd = buildFaqJsonLd(extractFaqFromMarkdown(post.content));
-  const ogImageUrl = `${siteConfig.url}/api/og?title=${encodeURIComponent(post.title)}`;
+
+  // generateMetadata와 동일한 풍부 OG URL — JSON-LD의 image 일치
+  const description = resolveDescription({
+    description: post.description,
+    content: post.content,
+    fallback: siteConfig.description,
+    minLength: 60,
+    maxLength: 200,
+  });
+  const readingTime = calculateReadingTime(post.content);
+  const ogDate = post.published_at
+    ? new Date(post.published_at).toISOString().slice(0, 10)
+    : "";
+  const ogImageParams = new URLSearchParams({
+    title: post.title,
+    desc: description.length > 160 ? description.slice(0, 157) + "…" : description,
+    ...(post.tags.length > 0 && { tags: post.tags.slice(0, 4).join(",") }),
+    ...(ogDate && { date: ogDate }),
+    ...(readingTime && { reading: readingTime }),
+    ...(post.category && { section: post.category }),
+  });
+  const ogImageUrl = `${siteConfig.url}/api/og?${ogImageParams.toString()}`;
 
   // GEO: 본문 단어 수 — 한글은 공백 기준이 어색하므로 글자 수도 같이 기록
   const wordCount = post.content
@@ -87,7 +149,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
-    description: post.description,
+    description,
     image: post.cover_image || ogImageUrl,
     datePublished: post.published_at,
     dateModified: post.updated_at,

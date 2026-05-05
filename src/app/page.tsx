@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/constants";
@@ -7,6 +8,42 @@ import { ShareSection } from "@/components/share/ShareSection";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
 export const revalidate = 60;
+
+const homeOgUrl = `${siteConfig.url}/api/og?${new URLSearchParams({
+  title: "Build. Ship. Reflect.",
+  desc: siteConfig.description,
+  section: "Home",
+}).toString()}`;
+
+export const metadata: Metadata = {
+  title: siteConfig.title,
+  description: siteConfig.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: siteConfig.title,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    type: "website",
+    locale: siteConfig.locale,
+    images: [
+      {
+        url: homeOgUrl,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} — Build. Ship. Reflect.`,
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [{ url: homeOgUrl, alt: siteConfig.name }],
+    creator: siteConfig.author.name,
+  },
+};
 
 export default async function Home() {
   const recentPosts = await getRecentPosts(5);

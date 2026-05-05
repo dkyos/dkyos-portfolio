@@ -5,11 +5,46 @@ import { Timeline } from "@/components/about/Timeline";
 import { siteConfig, authorSameAs } from "@/lib/constants";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
+const aboutDescription = `${profile.name} (${profile.nameEn}) — ${profile.role}. ${profile.bio}`.slice(
+  0,
+  200
+);
+
+const aboutOgUrl = `${siteConfig.url}/api/og?${new URLSearchParams({
+  title: `${profile.name} · ${profile.role}`,
+  desc: aboutDescription,
+  section: "About",
+}).toString()}`;
+
 export const metadata: Metadata = {
   title: "소개",
-  description: `${profile.name} - ${profile.role}. ${profile.bio}`,
+  description: aboutDescription,
   alternates: {
     canonical: "/about",
+  },
+  openGraph: {
+    title: `${profile.name} — ${profile.role}`,
+    description: aboutDescription,
+    url: `${siteConfig.url}/about`,
+    siteName: siteConfig.name,
+    type: "profile",
+    locale: siteConfig.locale,
+    images: [
+      {
+        url: aboutOgUrl,
+        width: 1200,
+        height: 630,
+        alt: `${profile.name} — ${profile.role}`,
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profile.name} — ${profile.role}`,
+    description: aboutDescription,
+    images: [{ url: aboutOgUrl, alt: profile.name }],
+    creator: siteConfig.author.name,
   },
 };
 
